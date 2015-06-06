@@ -1,17 +1,6 @@
 #include <sourcemod>
 #include <sdktools>
-#define PL_VERSION "1.2"
-
-/*
-	CHANGELOG:
-	1.0:
-		- Release.
-	1.1:
-		- Organized Code.
-		- Added AlliedMods support.
-	1.2:
-		- Renamed to "Extra Spawn Points".
-*/
+#define PL_VERSION "1.3"
 
 public Plugin:myinfo =
 {
@@ -78,42 +67,53 @@ public OnPluginStart()
 	AutoExecConfig(true, "sm_ExtraSpawnPoints");
 }
 
-public Action:Command_AddSpawns(iClient, sArgs) {
+public Action:Command_AddSpawns(iClient, sArgs) 
+{
 	AddMapSpawns();
 	
-	if (iClient == 0) {
+	if (iClient == 0) 
+	{
 		PrintToServer("[ESP] Added map spawns!");
-	} else {
+	} 
+	else 
+	{
 		PrintToChat(iClient, "\x02[ESP] \x03Added map spawns!");
 	}
 	
 	return Plugin_Handled;
 }
 
-public CVarChanged(Handle:hCVar, const String:sOldV[], const String:sNewV[]) {
+public CVarChanged(Handle:hCVar, const String:sOldV[], const String:sNewV[])
+{
 	OnConfigsExecuted();
 }
 
-public OnConfigsExecuted() {
+public OnConfigsExecuted() 
+{
 	GetValues();
 	
-	if (!g_bMapStart) {
-		if (g_fcvarMapStartDelay > 0.0) {
+	if (!g_bMapStart) 
+	{
+		if (g_fcvarMapStartDelay > 0.0) 
+		{
 			CreateTimer(g_fcvarMapStartDelay, timer_DelayAddSpawnPoints);
 		}
 		g_bMapStart = true;
 	}
 	
-	if (g_bcvarAuto && g_bMapStart) {
+	if (g_bcvarAuto && g_bMapStart) 
+	{
 		AddMapSpawns();
 	}
 }
 
-public Action:timer_DelayAddSpawnPoints(Handle:hTimer) {
+public Action:timer_DelayAddSpawnPoints(Handle:hTimer) 
+{
 	AddMapSpawns();
 }
 
-stock GetValues() {
+stock GetValues() 
+{
 	g_icvarTSpawns = GetConVarInt(g_hTSpawns);
 	g_icvarCTSpawns = GetConVarInt(g_hCTSpawns);
 	g_icvarTeams = GetConVarInt(g_hTeams);
@@ -123,7 +123,8 @@ stock GetValues() {
 	g_fcvarMapStartDelay = GetConVarFloat(g_hMapStartDelay);
 }
 
-stock AddMapSpawns() {
+stock AddMapSpawns() 
+{
 	new iTSpawns = 0;
 	new iCTSpawns = 0;
 	
@@ -152,30 +153,36 @@ stock AddMapSpawns() {
 		}
 	}
 	
-	if (g_bcvarDebug) {
+	if (g_bcvarDebug) 
+	{
 		LogMessage("[ESP]There are %d/%d CT points and %d/%d T points", iCTSpawns, g_icvarCTSpawns, iTSpawns, g_icvarTSpawns);
 	}
 	
-	if (g_bcvarCourse) {
-		if (iCTSpawns == 0 && iTSpawns > 0) {
+	if (g_bcvarCourse) 
+	{
+		if (iCTSpawns == 0 && iTSpawns > 0) 
+		{
 			g_icvarTSpawns *= 2;
 		}
 		
-		if (iTSpawns == 0 && iCTSpawns > 0) {
+		if (iTSpawns == 0 && iCTSpawns > 0) 
+		{
 			g_icvarCTSpawns *= 2;
 		}
 	}
 	
 	if(iCTSpawns && iCTSpawns < g_icvarCTSpawns && iCTSpawns > 0)
 	{
-		if (g_icvarTeams == 1 || g_icvarTeams == 3) {
+		if (g_icvarTeams == 1 || g_icvarTeams == 3) 
+		{
 			for(new i = iCTSpawns; i < g_icvarCTSpawns; i++)
 			{
 				new iEnt = CreateEntityByName("info_player_counterterrorist");
 				if (DispatchSpawn(iEnt))
 				{
 					TeleportEntity(iEnt, fVecCt, angVec, NULL_VECTOR);
-					if (g_bcvarDebug) {
+					if (g_bcvarDebug) 
+					{
 						LogMessage("[ESP]+1 CT spawn added!");
 					}
 				}
@@ -185,22 +192,24 @@ stock AddMapSpawns() {
 	
 	if(iTSpawns && iTSpawns < g_icvarTSpawns && iTSpawns > 0)
 	{
-		if (g_icvarTeams == 1 || g_icvarTeams == 2) {
+		if (g_icvarTeams == 1 || g_icvarTeams == 2) 
+		{
 			for(new i = iTSpawns; i < g_icvarTSpawns; i++)
 			{
 				new iEnt = CreateEntityByName("info_player_terrorist");
 				if (DispatchSpawn(iEnt))
 				{
 					TeleportEntity(iEnt, fVecT, angVec, NULL_VECTOR);
-					if (g_bcvarDebug) {
+					if (g_bcvarDebug) 
+					{
 						LogMessage("[ESP]+1 T spawn added!");
 					}
 				}
 			}
 		}
 	}
-	if (g_bcvarDebug) {
-		
+	if (g_bcvarDebug) 
+	{
 		for (new i = MaxClients; i < GetMaxEntities(); i++)
 		{
 			if (IsValidEdict(i) && IsValidEntity(i) && GetEdictClassname(i, sClassName, sizeof(sClassName)))
